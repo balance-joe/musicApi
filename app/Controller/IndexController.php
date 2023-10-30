@@ -11,6 +11,9 @@ declare(strict_types=1);
  */
 namespace App\Controller;
 
+use Hyperf\HttpServer\Annotation\AutoController;
+
+#[AutoController]
 class IndexController extends AbstractController
 {
     public function index()
@@ -23,4 +26,7 @@ class IndexController extends AbstractController
             'message' => "Hello {$user}.",
         ];
     }
+
+
+
 }
