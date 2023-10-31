@@ -15,6 +15,7 @@ namespace App\Controller;
 use App\Service\MusicApiFactory;
 use App\Service\TencentService;
 use Hyperf\Context\ApplicationContext;
+use Hyperf\Di\Container;
 use Hyperf\HttpServer\Annotation\AutoController;
 
 #[AutoController]
@@ -37,14 +38,26 @@ class IndexController extends AbstractController
      * 搜索
      * $type =
      * */
-    public function search()
+    public function search(Container $container)
     {
         $keyword = $this->request->input('keyword', '');
         $type = $this->request->input('type', 0);
         $offset = $this->request->input('offset', 1);
         $limit = $this->request->input('limit', 20);
-        $server = new TencentService();
-        $res = $server->search($keyword,$type);
+        $tencentService = $container->get(TencentService::class);
+        $res = $tencentService->search($keyword, $type, $offset, $limit);
+        return $res;
+    }
+
+    /**
+     * 获取歌词
+     * */
+    public function lyric(Container $container)
+    {
+        $mid = $this->request->input('mid' );
+        $type = $this->request->input('type', 1);
+        $tencentService = $container->get(TencentService::class);
+        $res = $tencentService->lyric($mid, $type);
         return $res;
     }
 

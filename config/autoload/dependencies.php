@@ -11,4 +11,5 @@ declare(strict_types=1);
  */
 return [
     \Hyperf\Guzzle\ClientFactory::class => \Hyperf\Guzzle\ClientFactory::class,
+    App\Service\TencentService::class => App\Service\TencentService::class,
 ];
