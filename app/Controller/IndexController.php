@@ -43,18 +43,9 @@ class IndexController extends AbstractController
         $type = $this->request->input('type', 0);
         $offset = $this->request->input('offset', 1);
         $limit = $this->request->input('limit', 20);
-        // 获取容器
-        $container = ApplicationContext::getContainer();
-        $musicApiFactory = $container->get(MusicApiFactory::class);
-
-// 根据需要的音乐服务类型创建相应的音乐 API 服务实例
-        $qqMusicApi = $musicApiFactory->createMusicApi('tencent');
-        var_dump($qqMusicApi->search($keyword,$type));
-        var_dump($keyword);
-        var_dump($type);
-        var_dump($offset);
-        var_dump($limit);
-
+        $server = new TencentService();
+        $res = $server->search($keyword,$type);
+        return $res;
     }
 
 }
