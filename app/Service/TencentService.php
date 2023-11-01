@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Service;
 
+use GuzzleHttp\Exception\GuzzleException;
 use Hyperf\Guzzle\ClientFactory;
 
 class TencentService
@@ -30,6 +31,41 @@ class TencentService
             'TE' => 'trailers',
             'Cookie' => ''
         ];
+    }
+
+    public function searchBack($keyword, $type, $offset = 1, $limit = 20)
+    {
+
+        $params = [
+            'form_params' => [
+                'comm' => [
+                    'ct' => '19',
+                    'cv' => '1859',
+                    'uin' => '0',
+                ],
+                'req' => [
+                    'method' => 'DoSearchForQQMusicDesktop',
+                    'module' => 'music.search.SearchCgiService',
+                    'param' => [
+                        'grp' => 1,
+                        'num_per_page' => $limit,
+                        'page_num' => $offset,
+                        'query' => $keyword,
+                        'search_type' => $type,
+                    ]
+                ]
+            ],
+            'headers' => $this->headers
+
+        ];
+
+        $options = [
+            'headers' => $this->headers
+        ];
+        $client = $this->clientFactory->create($options);
+        $response = $client->post('https://u.y.qq.com/cgi-bin/musicu.fcg', ['query' => $params]);
+        $res = $response->getBody()->getContents();
+        return $res;
     }
 
     /**
@@ -64,10 +100,12 @@ class TencentService
 
     /**
      * 获取歌词
-     * @param $mid int 歌曲id
-     * @param $type int 类型:1=带时间的歌词，2=文字歌词
-     * */
-    public function lyric($mid, $type = 1)
+     * @param $mid string 歌曲id
+     * @param $type string 类型:1=lyric格式歌词，2=文字歌词
+     * @return string
+     * @throws GuzzleException
+     */
+    public function lyric(string $mid, string $type = '1'): string
     {
         $params = [
             'query' => [
@@ -81,39 +119,45 @@ class TencentService
         $client = $this->clientFactory->create($options);
         $response = $client->get('https://c.y.qq.com/lyric/fcgi-bin/fcg_query_lyric_new.fcg', $params);
         $res = $response->getBody()->getContents();
-        return $res;
+        $result = json_decode($res, true);
+        if ($result['retcode'] != 0) {
+            return '';
+        }
+        $lyric = $result['lyric'];
+
+        //处理歌词为纯文本
+        if ($type === '2') {
+            $lyric = preg_replace('/\[[^\]]+\]/', '', $lyric);
+            // 替换多个连续的\r\n为单个\n
+            $lyric = trim(preg_replace('/\r\n+/', "\n", $lyric));
+        }
+        var_dump($lyric);
+        return $lyric;
     }
 
-
-    public function test($keyword, $type, $offset = 1, $limit = 20)
-    {
-        $url = 'https://u.y.qq.com/cgi-bin/musicu.fcg';
-        $data = [
-            'comm' => [
-                'ct' => '19',
-                'cv' => '1859',
-                'uin' => '0',
+    /**
+     * 搜索建议
+     * @param $keyword string 关键字
+     * */
+    public function suggestSearch(string $keyword){
+        $params = [
+            'query' => [
+                'key' => $keyword,
+                'format' => 'json',
             ],
-            'req' => [
-                'method' => 'DoSearchForQQMusicDesktop',
-                'module' => 'music.search.SearchCgiService',
-                'param' => [
-                    'grp' => 1,
-                    'num_per_page' => intval($limit),
-                    'page_num' => intval($offset),
-                    'query' => $keyword,
-                    'search_type' => trim($type),
-                ],
-            ],
+            'headers' => $this->headers
         ];
-
-
-        $client = $this->clientFactory->create();
-        $response = $client->post($url, [
-            'json' => $data,
-            'headers' => $this->headers,
-        ]);
-
-        return $response;
+        $options = [];
+        $client = $this->clientFactory->create($options);
+        $response = $client->get('https://c.y.qq.com/splcloud/fcgi-bin/smartbox_new.fcg', $params);
+        $res = $response->getBody()->getContents();
+        $result = json_decode($res, true);
+        return $result;
     }
+
+    public function mv()
+    {
+        //https://u.y.qq.com/cgi-bin/musicu.fcg?data=%7B%22getMvUrl%22%3A%7B%22module%22%3A%22gosrf.Stream.MvUrlProxy%22%2C%22method%22%3A%22GetMvUrls%22%2C%22param%22%3A%7B%22vids%22%3A%5B%22i00247i8v7b%22%5D%2C%22request_typet%22%3A10001%7D%7D%7D&g_tk=676242659&callback=jQuery1123016760720414443142_1564727885674&format=jsonp&inCharset=utf8&outCharset=GB2312&platform=yqq
+    }
+
 }

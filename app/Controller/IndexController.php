@@ -36,7 +36,6 @@ class IndexController extends AbstractController
 
     /**
      * 搜索
-     * $type =
      * */
     public function search(Container $container)
     {
@@ -45,8 +44,8 @@ class IndexController extends AbstractController
         $offset = $this->request->input('offset', 1);
         $limit = $this->request->input('limit', 20);
         $tencentService = $container->get(TencentService::class);
-        $res = $tencentService->search($keyword, $type, $offset, $limit);
-        return $res;
+        $res = $tencentService->suggestSearch($keyword, $type, $offset, $limit);
+        return $this->success($res);
     }
 
     /**
@@ -55,10 +54,10 @@ class IndexController extends AbstractController
     public function lyric(Container $container)
     {
         $mid = $this->request->input('mid' );
-        $type = $this->request->input('type', 1);
+        $type = $this->request->input('type', '1');
         $tencentService = $container->get(TencentService::class);
         $res = $tencentService->lyric($mid, $type);
-        return $res;
+        return $this->success($res);
     }
 
 }
