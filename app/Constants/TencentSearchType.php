@@ -44,4 +44,21 @@ class TencentSearchType extends AbstractConstants
      * @Message("用户")
      */
     const TYPE_CODE_USER = 8;
+
+    /**
+     * 常量
+     * */
+    public static function getConstants(): array
+    {
+        return [
+            self::TYPE_CODE_SONG => 'songlist',
+            self::TYPE_CODE_ARTIST => 'singer',
+            self::TYPE_CODE_ALBUM => 'album',
+            self::TYPE_CODE_PLAYLIST => 'songlist',
+            self::TYPE_CODE_MV => 'mv',
+            self::TYPE_CODE_LYRICS => 'song',
+            self::TYPE_CODE_USER => 'user',
+        ];
+    }
+
 }

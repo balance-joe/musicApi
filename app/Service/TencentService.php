@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\Service;
 
+use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
+use GuzzleHttp\Psr7\Request;
 use Hyperf\Guzzle\ClientFactory;
 
 class TencentService
@@ -27,7 +29,6 @@ class TencentService
             'Content-Type' => 'application/json',
             'Referer' => 'https://y.qq.com/',
             'Host' => 'u.y.qq.com',
-            // Origin: 'https://y.qq.com/',
             'TE' => 'trailers',
             'Cookie' => ''
         ];
@@ -41,49 +42,43 @@ class TencentService
         user-agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.77 Safari/537.36
         {"comm":{"ct":20,"cv":1845,"uin":"0"},"req":{"method":"DoSearchForQQMusicDesktop","module":"music.search.SearchCgiService","param":{"grp":1,"query":"伍佰","num_per_page":30,"page_num":1,"search_type":10}}}
      * */
-    public function searchBack($keyword, $type, $offset = 1, $limit = 20)
+    public function search($keyword, $type, $offset = 1, $limit = 20)
     {
-
-        $params = [
-            'json' => [
-                'comm' => [
-                    'ct' => '19',
-                    'cv' => '1859',
-                    'uin' => '0',
-                ],
-                'req' => [
-                    'method' => 'DoSearchForQQMusicDesktop',
-                    'module' => 'music.search.SearchCgiService',
-                    'param' => [
-                        'grp' => 1,
-                        'num_per_page' => $limit,
-                        'page_num' => $offset,
-                        'query' => $keyword,
-                        'search_type' => $type,
-                    ]
-                ]
+        var_dump($keyword, $type, $offset, $limit);
+        $params = json_encode([
+            'comm' => [
+                'ct' => 20,
+                'cv' => 1845,
+                'uin' => '0',
             ],
-        ];
-
-        $options = [
-            'headers' =>[
-                'User-Agent' => 'Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.1; WOW64; Trident/5.0)',
-                'Content-Type' => 'json/application;charset=utf-8',
-                'Referer' => 'https://y.qq.com/portal/profile.html'
+            'res' => [
+                'method' => 'DoSearchForQQMusicDesktop',
+                'module' => 'music.search.SearchCgiService',
+                'param' => [
+                    'grp' => 1,
+                    'query' => $keyword,
+                    'num_per_page' => intval($limit),
+                    'page_num' => intval($offset),
+                    'search_type' => intval($type),
+                ]
             ]
-        ];
+        ], JSON_UNESCAPED_UNICODE);
+        $client = $this->clientFactory->create();
+        $request = new Request('POST', 'https://u.y.qq.com/cgi-bin/musicu.fcg', $this->headers, $params);
+        $response = $client->send($request);
 
-        $params = '{"comm":{"ct":19,"cv":1845},"music.search.SearchCgiService":{"method":"DoSearchForQQMusicDesktop","module":"music.search.SearchCgiService","param":{"query":"周杰伦","num_per_page":30,"page_num":1}}}';
-        $client = $this->clientFactory->create($options);
-        $response = $client->post('https://u.y.qq.com/cgi-bin/musicu.fcg',['json'=>$params]);
-        $res = $response->getBody()->getContents();
-        return $res;
+        $res = json_decode($response->getBody()->getContents(), true);
+        if ($res['code'] === 0){
+            $result = $res['res']['data']['body'];
+        }
+        return $result;
     }
 
     /**
      * 搜索
+     * 这个接口查不到数据会报错
      */
-    public function search($keyword, $type, $offset = 1, $limit = 20)
+    public function searchBack($keyword, $type, $offset = 1, $limit = 20)
     {
         $params = [
             'query' => [
@@ -151,7 +146,8 @@ class TencentService
      * 搜索建议
      * @param $keyword string 关键字
      * */
-    public function suggestSearch(string $keyword){
+    public function suggestSearch(string $keyword)
+    {
         $params = [
             'query' => [
                 'key' => $keyword,

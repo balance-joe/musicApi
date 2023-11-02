@@ -44,7 +44,7 @@ class IndexController extends AbstractController
         $offset = $this->request->input('offset', 1);
         $limit = $this->request->input('limit', 20);
         $tencentService = $container->get(TencentService::class);
-        $res = $tencentService->suggestSearch($keyword, $type, $offset, $limit);
+        $res = $tencentService->search($keyword, $type, $offset, $limit);
         return $this->success($res);
     }
 
