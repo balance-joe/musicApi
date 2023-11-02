@@ -33,11 +33,19 @@ class TencentService
         ];
     }
 
+    /*
+     *
+     *  POST Https://u.y.qq.com/cgi-bin/musicu.fcg
+        referer: https://y.qq.com/portal/profile.html
+        Content-Type: json/application;charset=utf-8
+        user-agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.77 Safari/537.36
+        {"comm":{"ct":20,"cv":1845,"uin":"0"},"req":{"method":"DoSearchForQQMusicDesktop","module":"music.search.SearchCgiService","param":{"grp":1,"query":"伍佰","num_per_page":30,"page_num":1,"search_type":10}}}
+     * */
     public function searchBack($keyword, $type, $offset = 1, $limit = 20)
     {
 
         $params = [
-            'form_params' => [
+            'json' => [
                 'comm' => [
                     'ct' => '19',
                     'cv' => '1859',
@@ -55,15 +63,19 @@ class TencentService
                     ]
                 ]
             ],
-            'headers' => $this->headers
-
         ];
 
         $options = [
-            'headers' => $this->headers
+            'headers' =>[
+                'User-Agent' => 'Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.1; WOW64; Trident/5.0)',
+                'Content-Type' => 'json/application;charset=utf-8',
+                'Referer' => 'https://y.qq.com/portal/profile.html'
+            ]
         ];
+
+        $params = '{"comm":{"ct":19,"cv":1845},"music.search.SearchCgiService":{"method":"DoSearchForQQMusicDesktop","module":"music.search.SearchCgiService","param":{"query":"周杰伦","num_per_page":30,"page_num":1}}}';
         $client = $this->clientFactory->create($options);
-        $response = $client->post('https://u.y.qq.com/cgi-bin/musicu.fcg', ['query' => $params]);
+        $response = $client->post('https://u.y.qq.com/cgi-bin/musicu.fcg',['json'=>$params]);
         $res = $response->getBody()->getContents();
         return $res;
     }
