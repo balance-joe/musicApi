@@ -71,4 +71,12 @@ class IndexController extends AbstractController
         return $this->success($res);
     }
 
+    public function get_song_url(Container $container)
+    {
+        $mid = $this->request->input('mid');
+        $br = $this->request->input('br', 128);
+        $tencentService = $container->get(TencentService::class);
+        $res = $tencentService->getSongUrl($mid, $br);
+        return $this->success($res);
+    }
 }

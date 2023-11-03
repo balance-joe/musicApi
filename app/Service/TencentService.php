@@ -30,7 +30,7 @@ class TencentService
             'Referer' => 'https://y.qq.com/',
             'Host' => 'u.y.qq.com',
             'TE' => 'trailers',
-            'Cookie' => ''
+//            'Cookie' => ''
         ];
     }
 
@@ -210,6 +210,81 @@ class TencentService
         }
 
         return $result['cdlist'];
+    }
+
+
+    public function getSongUrl($mid, $br)
+    {
+        $uin = '0'; // 设置默认 uin 值
+
+        $typeMap = [
+            'm4a' => ['s' => 'C400', 'e' => '.m4a',],
+            '128' => ['s' => 'M500', 'e' => '.mp3',],
+            '320' => ['s' => 'M800', 'e' => '.mp3',],
+            'ape' => ['s' => 'A000', 'e' => '.ape',],
+            'flac' => ['s' => 'F000', 'e' => '.flac',],
+            'mflac' => ['s' => 'F0M0', 'e' => '.mflac',],
+            'Hi-Res' => ['s' => 'RS01', 'e' => '.flac',]
+        ];
+
+        if (!isset($typeMap[$br])) {
+            throw new \Exception("Song:br_error: br is not m4a, 128, 320, flac, mflac, Hi-Res");
+        }
+
+        $filename = array_map(function ($id) use ($typeMap, $br) {
+            return "{$typeMap[$br]['s']}{$id}{$id}{$typeMap[$br]['e']}";
+        }, array_filter(array_map('trim', explode(',', $mid))));
+
+        $mids = array_map('trim', array_filter(explode(',', $mid)));
+
+
+        $urlData = [
+            'req' => [
+                'module' => 'CDN.SrfCdnDispatchServer',
+                'method' => 'GetCdnDispatch',
+                'param' => [
+                    'guid' => '658650575',
+                    'calltype' => 0,
+                    'userip' => '',
+                ],
+            ],
+            'req_0' => [
+                'module' => 'vkey.GetVkeyServer',
+                'method' => 'CgiGetVkey',
+                'param' => [
+                    'filename' => $filename,
+                    'guid' => '658650575',
+                    'songmid' => $mids,
+                    'songtype' => [0],
+                    'uin' => $uin,
+                    'loginflag' => 1,
+                    'platform' => '20',
+                ],
+            ],
+            'comm' => [
+                'uin' => $uin,
+                'format' => 'json',
+                'ct' => 24,
+                'cv' => 0,
+            ],
+        ];
+
+        $url = 'https://u.y.qq.com/cgi-bin/musicu.fcg?format=json&data=' . json_encode($urlData);
+        $url = 'https://u.y.qq.com/cgi-bin/musicu.fcg?format=json&data={"req":{"module":"CDN.SrfCdnDispatchServer","method":"GetCdnDispatch","param":{"guid":"658650575","calltype":0,"userip":""}},"req_0":{"module":"vkey.GetVkeyServer","method":"CgiGetVkey","param":{"filename":["M500001JCkEn2BbL6H001JCkEn2BbL6H.mp3","M500000B4ijs4Ufwql000B4ijs4Ufwql.mp3"],"guid":"658650575","songmid":["001JCkEn2BbL6H","000B4ijs4Ufwql"],"songtype":[0],"uin":"0","loginflag":1,"platform":"20"}},"comm":{"uin":"0","format":"json","ct":24,"cv":0}}';
+        $options = $this->headers;
+        $client = $this->clientFactory->create($options);
+        $response = $client->get($url);
+        $result = json_decode($response->getBody()->getContents(), true);
+        if ($result['code'] !== 0){
+            return [];
+        }
+        $arrUrls = [];
+        if (!empty($result['req_0']['data']['midurlinfo'])) {
+            foreach ($result['req_0']['data']['midurlinfo'] as $e) {
+                $arrUrls[] = $e['purl'] ? 'https://isure.stream.qqmusic.qq.com/' . $e['purl'] : null;
+            }
+        }
+        return count($arrUrls) === 1 ? $arrUrls[0] : $arrUrls;
     }
 
 }
