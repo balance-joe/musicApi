@@ -51,7 +51,7 @@ class TencentSearchType extends AbstractConstants
     public static function getConstants(): array
     {
         return [
-            self::TYPE_CODE_SONG => 'songlist',
+            self::TYPE_CODE_SONG => 'song',
             self::TYPE_CODE_ARTIST => 'singer',
             self::TYPE_CODE_ALBUM => 'album',
             self::TYPE_CODE_PLAYLIST => 'songlist',

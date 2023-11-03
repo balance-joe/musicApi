@@ -53,10 +53,21 @@ class IndexController extends AbstractController
      * */
     public function lyric(Container $container)
     {
-        $mid = $this->request->input('mid' );
+        $mid = $this->request->input('mid');
         $type = $this->request->input('type', '1');
         $tencentService = $container->get(TencentService::class);
         $res = $tencentService->lyric($mid, $type);
+        return $this->success($res);
+    }
+
+    /**
+     * 获取歌单
+     * */
+    public function play_list_desc(Container $container)
+    {
+        $id = $this->request->input('id');
+        $tencentService = $container->get(TencentService::class);
+        $res = $tencentService->playListDesc($id);
         return $this->success($res);
     }
 
