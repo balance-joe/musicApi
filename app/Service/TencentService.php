@@ -50,12 +50,8 @@ class TencentService
         if (!in_array($type, $search_type)) {
             throw new \Exception('类型不正确');
         }
-        $params = json_encode([
-            'comm' => [
-                'ct' => 20,
-                'cv' => 1845,
-                'uin' => '0',
-            ],
+        $params = [
+            'comm' => ['ct' => 20, 'cv' => 1845, 'uin' => '0',],
             'res' => [
                 'method' => 'DoSearchForQQMusicDesktop',
                 'module' => 'music.search.SearchCgiService',
@@ -67,9 +63,14 @@ class TencentService
                     'search_type' => intval($type),
                 ]
             ]
-        ], JSON_UNESCAPED_UNICODE);
+        ];
         $client = $this->clientFactory->create();
-        $request = new Request('POST', 'https://u.y.qq.com/cgi-bin/musicu.fcg', $this->headers, $params);
+        $request = new Request(
+            'POST',
+            'https://u.y.qq.com/cgi-bin/musicu.fcg',
+            $this->headers,
+            json_encode($params, JSON_UNESCAPED_UNICODE)
+        );
         $response = $client->send($request);
 
         $res = json_decode($response->getBody()->getContents(), true);
@@ -89,16 +90,8 @@ class TencentService
     {
         $params = [
             'query' => [
-                'searchid' => 53806572956004615,
-                't' => $type,
-                'aggr' => 1,
-                'cr' => 1,
-                'catZhida' => 1,
-                'lossless' => 0,
-                'flag_qc' => 0,
-                'p' => $offset,
-                'n' => $limit,
-                'w' => $keyword,
+                't' => $type, 'p' => $offset, 'n' => $limit, 'w' => $keyword,
+                'searchid' => 53806572956004615, 'aggr' => 1, 'cr' => 1, 'catZhida' => 1, 'lossless' => 0, 'flag_qc' => 0,
             ],
         ];
 
@@ -107,9 +100,7 @@ class TencentService
         $res = $response->getBody()->getContents();
         $res = ltrim($res, 'callback(');
         $res = rtrim($res, ')');
-        $res = json_decode($res, true);
-
-        return $res;
+        return json_decode($res, true);
     }
 
     /**
@@ -128,8 +119,7 @@ class TencentService
         $options = [];
         $client = $this->clientFactory->create($options);
         $response = $client->get('https://c.y.qq.com/splcloud/fcgi-bin/smartbox_new.fcg', $params);
-        $res = $response->getBody()->getContents();
-        $result = json_decode($res, true);
+        $result = json_decode($response->getBody()->getContents(), true);
         return $result;
     }
 
@@ -153,8 +143,8 @@ class TencentService
         $options = [];
         $client = $this->clientFactory->create($options);
         $response = $client->get('https://c.y.qq.com/lyric/fcgi-bin/fcg_query_lyric_new.fcg', $params);
-        $res = $response->getBody()->getContents();
-        $result = json_decode($res, true);
+        $result = json_decode($response->getBody()->getContents(), true);
+
         if ($result['retcode'] != 0) {
             return '';
         }
@@ -183,28 +173,16 @@ class TencentService
     {
         $params = [
             'query' => [
-                'type' => 1,
-                'json' => 1,
-                'utf8' => 1,
-                'onlysong' => 0,
-                'new_format' => 1,
-                'disstid' => 7580163044,
-                'loginUin' => 0,
-                'hostUin' => 0,
-                'format' => 'json',
-                'inCharset' => 'utf8',
-                'outCharset' => 'utf-8',
-                'notice' => 0,
-                'platform' => 'yqq.json',
-                'needNewCode' => 0,
+                'disstid' => $id, 'type' => 1, 'json' => 1, 'utf8' => 1, 'onlysong' => 0, 'new_format' => 1,
+                'loginUin' => 0, 'hostUin' => 0, 'format' => 'json', 'inCharset' => 'utf8', 'outCharset' => 'utf-8',
+                'notice' => 0, 'platform' => 'yqq.json', 'needNewCode' => 0,
             ],
             'headers' => $this->headers
         ];
         $options = [];
         $client = $this->clientFactory->create($options);
         $response = $client->get("https://c.y.qq.com/qzone/fcg-bin/fcg_ucc_getcdinfo_byids_cp.fcg", $params);
-        $res = $response->getBody()->getContents();
-        $result = json_decode($res, true);
+        $result = json_decode($response->getBody()->getContents(), true);
         if ($result['code'] !== 0) {
             return [];
         }
@@ -212,7 +190,9 @@ class TencentService
         return $result['cdlist'];
     }
 
-
+    /**
+     * 获取音乐地址
+     * */
     public function getSongUrl($mid, $br)
     {
         $uin = '0'; // 设置默认 uin 值
@@ -242,40 +222,22 @@ class TencentService
             'req' => [
                 'module' => 'CDN.SrfCdnDispatchServer',
                 'method' => 'GetCdnDispatch',
-                'param' => [
-                    'guid' => '658650575',
-                    'calltype' => 0,
-                    'userip' => '',
-                ],
+                'param' => ['guid' => '658650575', 'calltype' => 0, 'userip' => ''],
             ],
             'req_0' => [
                 'module' => 'vkey.GetVkeyServer',
                 'method' => 'CgiGetVkey',
-                'param' => [
-                    'filename' => $filename,
-                    'guid' => '658650575',
-                    'songmid' => $mids,
-                    'songtype' => [0],
-                    'uin' => $uin,
-                    'loginflag' => 1,
-                    'platform' => '20',
-                ],
+                'param' => ['filename' => $filename, 'songmid' => $mids, 'uin' => $uin, 'guid' => '658650575', 'songtype' => [0], 'loginflag' => 1, 'platform' => '20'],
             ],
-            'comm' => [
-                'uin' => $uin,
-                'format' => 'json',
-                'ct' => 24,
-                'cv' => 0,
-            ],
+            'comm' => ['uin' => $uin, 'format' => 'json', 'ct' => 24, 'cv' => 0],
         ];
 
         $url = 'https://u.y.qq.com/cgi-bin/musicu.fcg?format=json&data=' . json_encode($urlData);
-        $url = 'https://u.y.qq.com/cgi-bin/musicu.fcg?format=json&data={"req":{"module":"CDN.SrfCdnDispatchServer","method":"GetCdnDispatch","param":{"guid":"658650575","calltype":0,"userip":""}},"req_0":{"module":"vkey.GetVkeyServer","method":"CgiGetVkey","param":{"filename":["M500001JCkEn2BbL6H001JCkEn2BbL6H.mp3","M500000B4ijs4Ufwql000B4ijs4Ufwql.mp3"],"guid":"658650575","songmid":["001JCkEn2BbL6H","000B4ijs4Ufwql"],"songtype":[0],"uin":"0","loginflag":1,"platform":"20"}},"comm":{"uin":"0","format":"json","ct":24,"cv":0}}';
         $options = $this->headers;
         $client = $this->clientFactory->create($options);
         $response = $client->get($url);
         $result = json_decode($response->getBody()->getContents(), true);
-        if ($result['code'] !== 0){
+        if ($result['code'] !== 0) {
             return [];
         }
         $arrUrls = [];
@@ -285,6 +247,34 @@ class TencentService
             }
         }
         return count($arrUrls) === 1 ? $arrUrls[0] : $arrUrls;
+    }
+
+    /**
+     * @param $mid string 歌曲id
+     * */
+    public function song(string $mid)
+    {
+
+        $params = [
+            'query' => [
+                'songmid' => $mid,
+                'platform' => 'yqq', 'format' => 'json',
+            ],
+            'headers' => $this->headers
+        ];
+        $client = $this->clientFactory->create();
+        $response = $client->get('https://c.y.qq.com/v8/fcg-bin/fcg_play_single_song.fcg', $params);
+        $result = json_decode($response->getBody()->getContents(), true);
+        return (new SongFormatService)->format_tencent($result['data']);
+    }
+
+    /**
+     * 设置Cookie
+     * */
+    public function setCookie($data)
+    {
+        $cookies = TencentCookieService::parse($data);
+        return $cookies;
     }
 
 }
