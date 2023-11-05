@@ -254,7 +254,6 @@ class TencentService
      * */
     public function song(string $mid)
     {
-
         $params = [
             'query' => [
                 'songmid' => $mid,
@@ -266,6 +265,31 @@ class TencentService
         $response = $client->get('https://c.y.qq.com/v8/fcg-bin/fcg_play_single_song.fcg', $params);
         $result = json_decode($response->getBody()->getContents(), true);
         return (new SongFormatService)->format_tencent($result['data']);
+    }
+
+    /**
+     * 获取歌手信息
+     * http://c.y.qq.com/splcloud/fcgi-bin/fcg_get_singer_desc.fcg?utf8=1&outCharset=utf-8&format=xml&singermid=0025NhlN2yWrP4
+     * */
+    public function artist($id)
+    {
+
+        $params = [
+            'query' => [
+                'utf8' => '1',
+                'outCharset' => 'utf-8',
+                'format' => 'xml',
+                'singermid' => $id,
+            ],
+            'headers' => [
+                'Referer' => "https://y.qq.com"
+            ]
+        ];
+        var_dump($params);
+        $client = $this->clientFactory->create(['']);
+        $response = $client->get('https://c.y.qq.com/v8/fcg-bin/fcg_play_single_song.fcg', $params);
+        $result = json_decode($response->getBody()->getContents(), true);
+        return $result;
     }
 
     /**

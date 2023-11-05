@@ -82,6 +82,16 @@ class IndexController extends AbstractController
     }
 
     /**
+     * 获取歌曲详情
+     * */
+    public function artist(Container $container){
+        $id = $this->request->input('id');
+        $tencentService = $container->get(TencentService::class);
+        $res = $tencentService->artist($id);
+        return $this->success($res);
+    }
+
+    /**
      * 获取连接地址
      * */
     public function get_song_url(Container $container)
