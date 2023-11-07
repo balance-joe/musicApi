@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Service;
 
 use App\Constants\TencentSearchType;
+use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Psr7\Request;
 use Hyperf\Guzzle\ClientFactory;
@@ -26,11 +27,9 @@ class TencentService
         $this->clientFactory = $clientFactory;
         $this->headers = [
             'User-Agent' => 'Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.1; WOW64; Trident/5.0)',
-            'Content-Type' => 'application/json',
             'Referer' => 'https://y.qq.com/',
             'Host' => 'u.y.qq.com',
             'TE' => 'trailers',
-//            'Cookie' => ''
         ];
     }
 
@@ -193,7 +192,7 @@ class TencentService
     /**
      * 获取音乐地址
      * */
-    public function getSongUrl($mid, $br)
+    public function getSongUrl($mid, $br = '128')
     {
         $uin = '0'; // 设置默认 uin 值
 
@@ -233,9 +232,11 @@ class TencentService
         ];
 
         $url = 'https://u.y.qq.com/cgi-bin/musicu.fcg?format=json&data=' . json_encode($urlData);
-        $options = $this->headers;
-        $client = $this->clientFactory->create($options);
-        $response = $client->get($url);
+        $headers = $this->headers;
+        $headers['Cookie'] = $this->getCookie();
+        $client = $this->clientFactory->create();
+        $request = new Request('GET', $url, $headers);
+        $response = $client->send($request);
         $result = json_decode($response->getBody()->getContents(), true);
         if ($result['code'] !== 0) {
             return [];
@@ -285,10 +286,10 @@ class TencentService
                 'Referer' => "https://y.qq.com"
             ]
         ];
-        var_dump($params);
-        $client = $this->clientFactory->create(['']);
+        $client = $this->clientFactory->create();
         $response = $client->get('https://c.y.qq.com/v8/fcg-bin/fcg_play_single_song.fcg', $params);
-        $result = json_decode($response->getBody()->getContents(), true);
+        $result = $response->getBody()->getContents();
+        var_dump($result);
         return $result;
     }
 
@@ -299,6 +300,14 @@ class TencentService
     {
         $cookies = TencentCookieService::parse($data);
         return $cookies;
+    }
+
+    /**
+     * 获取Cookie
+     * */
+    public function getCookie()
+    {
+        return ;
     }
 
 }

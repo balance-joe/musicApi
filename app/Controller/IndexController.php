@@ -74,7 +74,8 @@ class IndexController extends AbstractController
     /**
      * 获取歌曲详情
      * */
-    public function song(Container $container){
+    public function song(Container $container)
+    {
         $mid = $this->request->input('mid');
         $tencentService = $container->get(TencentService::class);
         $res = $tencentService->song($mid);
@@ -84,7 +85,8 @@ class IndexController extends AbstractController
     /**
      * 获取歌曲详情
      * */
-    public function artist(Container $container){
+    public function artist(Container $container)
+    {
         $id = $this->request->input('id');
         $tencentService = $container->get(TencentService::class);
         $res = $tencentService->artist($id);
@@ -104,7 +106,24 @@ class IndexController extends AbstractController
     }
 
     /**
-     *
+     * 设置Cookie
      * */
+    public function setCookie(Container $container)
+    {
+        $cookie = $this->request->input('cookie', '');
+        $tencentService = $container->get(TencentService::class);
+        $res = $tencentService->setCookie($cookie);
+        return $this->success($res);
+    }
 
+    /**
+     * 获取Cookie
+     * */
+    public function getCookie(Container $container)
+    {
+        $cookie = $this->request->input('cookie', '');
+        $tencentService = $container->get(TencentService::class);
+        $res = $tencentService->getCookie($cookie);
+        return $this->success($res);
+    }
 }
