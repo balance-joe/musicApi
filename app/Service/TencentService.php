@@ -8,6 +8,7 @@ use App\Constants\TencentSearchType;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Psr7\Request;
+use Hyperf\Cache\Cache;
 use Hyperf\Guzzle\ClientFactory;
 
 class TencentService
@@ -289,7 +290,6 @@ class TencentService
         $client = $this->clientFactory->create();
         $response = $client->get('https://c.y.qq.com/v8/fcg-bin/fcg_play_single_song.fcg', $params);
         $result = $response->getBody()->getContents();
-        var_dump($result);
         return $result;
     }
 
@@ -299,6 +299,8 @@ class TencentService
     public function setCookie($data)
     {
         $cookies = TencentCookieService::parse($data);
+        redis()->set('qq_cookie', $data);
+
         return $cookies;
     }
 
@@ -307,7 +309,7 @@ class TencentService
      * */
     public function getCookie()
     {
-        return ;
+        return redis()->get('qq_cookie');
     }
 
 }

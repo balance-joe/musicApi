@@ -13,6 +13,7 @@ declare(strict_types=1);
 namespace App\Controller;
 
 use App\Service\MusicApiFactory;
+use App\Service\TencentCookieService;
 use App\Service\TencentService;
 use Hyperf\Context\ApplicationContext;
 use Hyperf\Di\Container;
@@ -110,10 +111,10 @@ class IndexController extends AbstractController
      * */
     public function setCookie(Container $container)
     {
-        $cookie = $this->request->input('cookie', '');
+        $data = $this->request->input('data', '');
         $tencentService = $container->get(TencentService::class);
-        $res = $tencentService->setCookie($cookie);
-        return $this->success($res);
+        $cookie = $tencentService->setCookie($data);
+        return $this->success($cookie);
     }
 
     /**

@@ -27,7 +27,7 @@ class TencentCookieService
                 throw new \Exception("parse error");
             }
         } catch (\Exception $e) {
-            throw new \Exception('Cookie:parse_error', 'cookie parse error');
+            throw new \Exception('Cookie:parse_error', 0);
         }
     }
 
