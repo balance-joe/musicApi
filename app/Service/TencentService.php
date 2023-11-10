@@ -298,8 +298,8 @@ class TencentService
      * */
     public function setCookie($data)
     {
-        $cookies = TencentCookieService::parse($data);
-        redis()->set('qq_cookie', $data);
+        $cookies = CookieService::parse($data);
+        cache()->set('qq_cookie', $data);
 
         return $cookies;
     }
@@ -309,7 +309,9 @@ class TencentService
      * */
     public function getCookie()
     {
-        return redis()->get('qq_cookie');
+        return cache()->get('qq_cookie');
     }
+
+
 
 }

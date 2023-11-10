@@ -2,7 +2,7 @@
 
 namespace App\Service;
 
-class TencentCookieService
+class CookieService
 {
     public static function parse($cookies)
     {

@@ -13,7 +13,7 @@ declare(strict_types=1);
 namespace App\Controller;
 
 use App\Service\MusicApiFactory;
-use App\Service\TencentCookieService;
+use App\Service\CookieService;
 use App\Service\TencentService;
 use Hyperf\Context\ApplicationContext;
 use Hyperf\Di\Container;

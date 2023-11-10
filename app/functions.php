@@ -18,6 +18,21 @@ if (! function_exists('container')) {
 
 }
 
+if (! function_exists('cache')) {
+
+    /**
+     * 获取Cache实例
+     * @return \Hyperf\Redis\Redis
+     * @throws \Psr\Container\ContainerExceptionInterface
+     * @throws \Psr\Container\NotFoundExceptionInterface
+     */
+    function cache()
+    {
+        return container()->get(\Psr\SimpleCache\CacheInterface::class);
+    }
+
+}
+
 if (! function_exists('redis')) {
 
     /**
