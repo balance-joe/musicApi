@@ -39,8 +39,20 @@ class SongFormatService
             'pic_id' => $data['album']['mid'],
             'url_id' => $data['mid'],
             'lyric_id' => $data['mid'],
+            'file' => $data['file'],
             'source' => 'tencent',
         );
+        $file_list = [
+            'size_96aac' => 'm4a',
+            'size_128mp3' => '128',
+            'size_320mp3' => '320',
+            'size_ape' => 'ape',
+            'size_flac' => 'flac',
+            'size_hires' => 'Hi-Res',
+        ];
+//        foreach ($){
+//
+//        }
         foreach ($data['singer'] as $vo) {
             $item = [
                 'id' => $vo['mid'],
