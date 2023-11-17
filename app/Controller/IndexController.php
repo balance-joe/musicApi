@@ -12,10 +12,8 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
-use App\Service\MusicApiFactory;
-use App\Service\CookieService;
+use App\Service\DownloadService;
 use App\Service\TencentService;
-use Hyperf\Context\ApplicationContext;
 use Hyperf\Di\Container;
 use Hyperf\HttpServer\Annotation\AutoController;
 
@@ -127,5 +125,13 @@ class IndexController extends AbstractController
         $tencentService = $container->get(TencentService::class);
         $res = $tencentService->getCookie($cookie);
         return $this->success($res);
+    }
+
+    /**
+     * 下载音乐
+     * */
+    public function down(DownloadService $downloadService){
+
+        $downloadService->downloadFile();
     }
 }
