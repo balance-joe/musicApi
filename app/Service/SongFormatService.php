@@ -42,17 +42,7 @@ class SongFormatService
             'file' => $data['file'],
             'source' => 'tencent',
         );
-        $file_list = [
-            'size_96aac' => 'm4a',
-            'size_128mp3' => '128',
-            'size_320mp3' => '320',
-            'size_ape' => 'ape',
-            'size_flac' => 'flac',
-            'size_hires' => 'Hi-Res',
-        ];
-//        foreach ($){
-//
-//        }
+
         foreach ($data['singer'] as $vo) {
             $item = [
                 'id' => $vo['mid'],
@@ -60,7 +50,24 @@ class SongFormatService
             ];
             $result['artist'][] = $item;
         }
+        //处理文件格式
+        $formatList = [
+            'size_96aac' => 'm4a',
+            'size_128mp3' => '128',
+            'size_320mp3' => '320',
+            'size_ape' => 'ape',
+            'size_flac' => 'flac',
+            'size_hires' => 'Hi-Res',
+        ];
 
+        $includedFormats = array();
+        foreach ($formatList as $key => $value) {
+            $fileSizeKey = $key;
+            if (array_key_exists($fileSizeKey, $result['file']) && $result['file'][$fileSizeKey] > 0) {
+                $includedFormats[] = $value;
+            }
+        }
+        $result['file'] = $includedFormats;
         return $result;
     }
 
