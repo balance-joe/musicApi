@@ -14,6 +14,7 @@ namespace App\Controller;
 
 use App\Service\DownloadService;
 use App\Service\TencentService;
+use App\Support\Utils;
 use Hyperf\Di\Container;
 use Hyperf\HttpServer\Annotation\AutoController;
 
@@ -99,7 +100,6 @@ class IndexController extends AbstractController
     {
         $mid = $this->request->input('mid');
         $br = $this->request->input('br', 128);
-        var_dump($br);
         $tencentService = $container->get(TencentService::class);
         $res = $tencentService->getSongUrl($mid, $br);
         return $this->success($res);
@@ -130,8 +130,16 @@ class IndexController extends AbstractController
     /**
      * 下载音乐
      * */
-    public function down(DownloadService $downloadService){
+    public function down(Container $container, DownloadService $downloadService)
+    {
+        $mid = $this->request->input('mid', '');
 
-        $downloadService->downloadFile();
+        $tencentService = $container->get(TencentService::class);
+        $song_info = $tencentService->song($mid);
+        $song_info['url'] = $tencentService->getSongUrl($mid);
+
+        $res = $downloadService->downloadFile($song_info);
+        return $this->success($res);
+
     }
 }

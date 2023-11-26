@@ -44,11 +44,7 @@ class SongFormatService
         );
 
         foreach ($data['singer'] as $vo) {
-            $item = [
-                'id' => $vo['mid'],
-                'name' => $vo['name']
-            ];
-            $result['artist'][] = $item;
+            $result['artist'][] = $vo['name'];
         }
         //处理文件格式
         $formatList = [
