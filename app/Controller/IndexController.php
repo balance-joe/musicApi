@@ -12,9 +12,7 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
-use App\Service\DownloadService;
 use App\Service\TencentService;
-use App\Support\Utils;
 use Hyperf\Di\Container;
 use Hyperf\HttpServer\Annotation\AutoController;
 
@@ -94,7 +92,7 @@ class IndexController extends AbstractController
     }
 
     /**
-     * 获取连接地址
+     * 获取歌曲地址
      * */
     public function get_song_url(Container $container)
     {
@@ -125,21 +123,5 @@ class IndexController extends AbstractController
         $tencentService = $container->get(TencentService::class);
         $res = $tencentService->getCookie($cookie);
         return $this->success($res);
-    }
-
-    /**
-     * 下载音乐
-     * */
-    public function down(Container $container, DownloadService $downloadService)
-    {
-        $mid = $this->request->input('mid', '');
-
-        $tencentService = $container->get(TencentService::class);
-        $song_info = $tencentService->song($mid);
-        $song_info['url'] = $tencentService->getSongUrl($mid);
-
-        $res = $downloadService->downloadFile($song_info);
-        return $this->success($res);
-
     }
 }
