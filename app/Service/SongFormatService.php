@@ -30,7 +30,6 @@ class SongFormatService
 
     public function format_tencent($data)
     {
-        $data = $data[0];
         $result = array(
             'id' => $data['mid'],
             'name' => $data['name'],

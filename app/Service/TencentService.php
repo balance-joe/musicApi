@@ -5,11 +5,8 @@ declare(strict_types=1);
 namespace App\Service;
 
 use App\Constants\TencentSearchType;
-use App\Support\Utils;
-use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Psr7\Request;
-use Hyperf\Cache\Cache;
 use Hyperf\Guzzle\ClientFactory;
 
 class TencentService
@@ -261,7 +258,7 @@ class TencentService
         $client = $this->clientFactory->create();
         $response = $client->get('https://c.y.qq.com/v8/fcg-bin/fcg_play_single_song.fcg', $params);
         $result = json_decode($response->getBody()->getContents(), true);
-        return (new SongFormatService)->format_tencent($result['data']);
+        return (new SongFormatService)->format_tencent($result['data'][0]);
     }
 
     /**

@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Service\DownloadService;
+use App\Service\SongFormatService;
 use App\Service\TencentService;
 use Hyperf\Di\Container;
 use Hyperf\HttpServer\Annotation\AutoController;
@@ -21,11 +22,12 @@ class DownloadController extends AbstractController
     {
         $mid = $this->request->input('mid', '');
 
-        $tencentService = $container->get(TencentService::class);
-        $song_info = $tencentService->song($mid);
-        $song_info['url'] = $tencentService->getSongUrl($mid);
+        $list = cache()->get('music_list') ?: [];
 
-        $res = $downloadService->downloadFile($song_info);
+        $has_lyric = true;
+        foreach ($list as $item){
+            $res = $downloadService->downloadMusic($item, $has_lyric);
+        }
         return $this->success($res);
     }
 
@@ -34,7 +36,18 @@ class DownloadController extends AbstractController
      * */
     public function list(Container $container, DownloadService $downloadService)
     {
-        return cache()->get('music_list');
+        $list = cache()->get('music_list');
+        $new = [];
+        foreach ($list as $item) {
+            $val = $item;
+            $val['id'] = $item['mid'];
+            unset($val['mid']);
+            $new[] = $val;
+        }
+        cache()->set('music_list', $new);
+        $list = cache()->get('music_list');
+        return $this->success($list);
+
     }
 
     /**
@@ -42,14 +55,10 @@ class DownloadController extends AbstractController
      * */
     public function add(Container $container)
     {
-        $list = cache()->get('music_list') ?: [];
 
         $mid = $this->request->input('mid');
         if (!$mid) {
             return $this->error('请选择歌曲');
-        }
-        if (in_array($mid, array_column($list, 'mid'))) {
-            return $this->error('歌曲已存在');
         }
 
         $tencentService = $container->get(TencentService::class);
@@ -58,18 +67,34 @@ class DownloadController extends AbstractController
             return $this->error('歌曲不存在');
         }
 
-        $music_info['url'] = $tencentService->getSongUrl($mid, end($music_info['file']));
-        $list[] = [
-            'mid' => $music_info['id'],
-            'lyric_id' => $music_info['lyric_id'],
-            'music_name' => $music_info['name'],
-            'artist' => $music_info['artist'],
-            'source' => $music_info['source'],
-            'url' => $music_info['url']
-        ];
-        cache()->set('music_list', $list);
+        DownloadService::addList($music_info);
+
         return $this->success([], '添加成功');
     }
 
+    /**
+     * 下载歌单
+     * */
+    public function playlist(Container $container)
+    {
+        $id = $this->request->input('id');
+        $tencentService = $container->get(TencentService::class);
+        $res = $tencentService->playListDesc($id);
+        if (!$res) {
+            return $this->error('歌单不存在', $res);
+        }
+        $song_list = $res[0]['songlist'];
+
+        $new_song_list = [];
+        foreach ($song_list as $song) {
+            $music_info = (new SongFormatService)->format_tencent($song);
+            DownloadService::addList($music_info);
+        }
+//        return $this->success($new_song_list, '添加成功');
+//        foreach ($res as $item){
+//
+//        }
+
+    }
 
 }
