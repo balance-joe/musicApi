@@ -22,13 +22,14 @@ class DownloadController extends AbstractController
     {
         $mid = $this->request->input('mid', '');
 
-        $list = cache()->get('music_list') ?: [];
+//        $list = cache()->get('music_list') ?: [];
+//        return $this->success($list);
 
-        $has_lyric = true;
-        foreach ($list as $item){
-            $res = $downloadService->downloadMusic($item, $has_lyric);
-        }
-        return $this->success($res);
+//        $has_lyric = true;
+//        $downloadService->multiThreadDownload($list);
+//        foreach ($list as $item){
+//            $res = $downloadService->downloadMusic($item, $has_lyric);
+//        }
     }
 
     /**
@@ -36,15 +37,6 @@ class DownloadController extends AbstractController
      * */
     public function list(Container $container, DownloadService $downloadService)
     {
-        $list = cache()->get('music_list');
-        $new = [];
-        foreach ($list as $item) {
-            $val = $item;
-            $val['id'] = $item['mid'];
-            unset($val['mid']);
-            $new[] = $val;
-        }
-        cache()->set('music_list', $new);
         $list = cache()->get('music_list');
         return $this->success($list);
 

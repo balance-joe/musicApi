@@ -1,5 +1,6 @@
 <?php
 
+use GuzzleHttp\Exception\GuzzleException;
 use Hyperf\Contract\StdoutLoggerInterface;
 use Hyperf\Logger\LoggerFactory;
 use Hyperf\Utils\ApplicationContext;
@@ -96,3 +97,32 @@ if (! function_exists('format_size')) {
         return round($size, 2) . $units[$index];
     }
 }
+
+//if (!function_exists('exception_array')) {
+//    /**
+//     * 异常转数组
+//     * @param object $exception
+//     * @return array
+//     */
+//    function exception_array(object $exception): array
+//    {
+//        $exceptionArray = [
+//            'Message' => $exception->getMessage(),
+//            'Line' => $exception->getLine(),
+//            'File' => $exception->getFile(),
+//            'Code' => $exception->getCode(),
+//            'Trace' => $exception->getTrace(),
+//            'Time' => date('Y-m-d H:i:s'),
+//        ];
+//
+//        if ($exception instanceof \Error) {
+//            $exceptionArray['ErrorType'] = get_class($exception);
+//        } elseif ($exception instanceof GuzzleException) {
+//            $exceptionArray['ExceptionType'] = 'HTTP请求错误';
+//        } elseif ($exception instanceof \Exception) {
+//            $exceptionArray['ExceptionType'] = get_class($exception);
+//        }
+//
+//        return $exceptionArray;
+//    }
+//}
