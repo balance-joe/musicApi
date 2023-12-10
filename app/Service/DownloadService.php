@@ -42,20 +42,22 @@ class DownloadService
         return cache()->set('music_list', $list);
     }
 
-    function multiThreadDownload(array $song_list)
+    /**
+     * 批量下载歌曲
+     * */
+    function multiThreadDownload(array $song_list, $has_lyric)
     {
         // 使用并发限制组件限制下载并发数量
         $parallel = new Parallel(5); // 这里设置最大并发数为 10
-
         // 创建一个协程函数来执行多线程下载
-        Coroutine::create(function () use ($parallel, $song_list) {
+        Coroutine::create(function () use ($parallel, $song_list, $has_lyric) {
             $clientFactory = make(ClientFactory::class);
             $client = $clientFactory->create();
 
             foreach ($song_list as $song) {
-                $parallel->add(function () use ($song, $client) {
+                $parallel->add(function () use ($song, $client, $has_lyric) {
                     // 定义保存文件的路径
-                    $this->downloadMusic($song);
+                    $this->downloadMusic($song, $has_lyric);
                 });
             }
             $parallel->wait();
@@ -67,8 +69,10 @@ class DownloadService
      * */
     public function downloadMusic($song, $has_lyric = false)
     {
-        var_dump($song);
-        return $song;
+        if (!$song['url']) {
+            logger()->error('文件地址不存在', ['歌曲名称' => $song['name']]);
+            return false;
+        }
 
         $savePath = Utils::getSavePath($song);
         if ($has_lyric) {

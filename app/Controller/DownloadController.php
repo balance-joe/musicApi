@@ -22,14 +22,27 @@ class DownloadController extends AbstractController
     {
         $mid = $this->request->input('mid', '');
 
-//        $list = cache()->get('music_list') ?: [];
-//        return $this->success($list);
+        return $this->success([]);
+    }
 
-//        $has_lyric = true;
-//        $downloadService->multiThreadDownload($list);
-//        foreach ($list as $item){
-//            $res = $downloadService->downloadMusic($item, $has_lyric);
-//        }
+    /**
+     * 下载列表
+     * */
+    public function downList(Container $container, DownloadService $downloadService)
+    {
+        $has_lyric = true;
+        $list = cache()->get('music_list') ?: [];
+        $downloadService->multiThreadDownload($list,$has_lyric);
+    }
+
+
+    /**
+     * 清空下载列表
+     * */
+    public function clearList()
+    {
+        cache()->set('music_list', []);
+        return $this->success([], '清除成功');
     }
 
     /**
@@ -39,7 +52,6 @@ class DownloadController extends AbstractController
     {
         $list = cache()->get('music_list');
         return $this->success($list);
-
     }
 
     /**
