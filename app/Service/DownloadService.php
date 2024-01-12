@@ -66,6 +66,8 @@ class DownloadService
 
     /**
      * 下载
+     * @param $song array 歌曲详情
+     * @param bool $has_lyric
      * */
     public function downloadMusic($song, $has_lyric = false)
     {

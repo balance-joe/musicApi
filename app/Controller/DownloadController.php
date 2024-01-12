@@ -21,7 +21,12 @@ class DownloadController extends AbstractController
     public function down(Container $container, DownloadService $downloadService)
     {
         $mid = $this->request->input('mid', '');
-
+        $tencentService = $container->get(TencentService::class);
+        $music_info = $tencentService->song($mid);
+        if (!$music_info) {
+            return $this->error('歌曲不存在');
+        }
+        $downloadService->downloadMusic($music_info);
         return $this->success([]);
     }
 
@@ -50,6 +55,7 @@ class DownloadController extends AbstractController
      * */
     public function list(Container $container, DownloadService $downloadService)
     {
+        $list_id = $this->request->input('$list_id');
         $list = cache()->get('music_list');
         return $this->success($list);
     }
@@ -89,16 +95,11 @@ class DownloadController extends AbstractController
         }
         $song_list = $res[0]['songlist'];
 
-        $new_song_list = [];
         foreach ($song_list as $song) {
             $music_info = (new SongFormatService)->format_tencent($song);
             DownloadService::addList($music_info);
         }
-//        return $this->success($new_song_list, '添加成功');
-//        foreach ($res as $item){
-//
-//        }
-
+        return $this->success([], '添加成功');
     }
 
 }
