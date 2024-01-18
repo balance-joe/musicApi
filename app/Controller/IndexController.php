@@ -12,6 +12,7 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
+use App\Service\MusicApiFactory;
 use App\Service\TencentService;
 use Hyperf\Di\Container;
 use Hyperf\HttpServer\Annotation\AutoController;
@@ -21,8 +22,12 @@ class IndexController extends AbstractController
 {
 
 
-    public function index()
+    public function index(Container $container)
     {
+        $musicApi = new MusicApiFactory($container);
+        $res = $musicApi->createMusicApi('tencent');
+        $res = $res->song('');
+
         $user = $this->request->input('user', 'Hyperf');
         $method = $this->request->getMethod();
 
