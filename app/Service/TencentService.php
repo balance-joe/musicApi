@@ -185,7 +185,7 @@ class TencentService
     /**
      * 获取音乐地址
      * */
-    public function getSongUrl($mid, $br = '128')
+    public function url($mid, $br = '128')
     {
         $uin = '0'; // 设置默认 uin 值
 

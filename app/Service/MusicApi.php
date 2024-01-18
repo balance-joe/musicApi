@@ -10,10 +10,13 @@ namespace App\Service;
 interface MusicApi
 {
 
+    /**
+     * 搜索
+     * */
     public function search($keyword, $type, $offset = 1, $limit = 20): array;
 
     /**
-     * 歌单
+     * 歌单详情
      * @param $id string 歌单id
      * */
     public function playList(string $id): array;
@@ -41,13 +44,13 @@ interface MusicApi
      * @param $songId string 歌曲id
      * @param $type int 歌词类型: 1=文本,2=lyric格式的歌词
      * */
-    public function lyric(string $songId, int $type): array;
+    public function lyric(string $songId, int $type): string;
 
     /**
      * 歌曲url
      * @param $songId string 歌曲id
      * */
-    public function url(string $songId): string;
+    public function url(string $songId): array;
 
     /**
      * 榜单列表
@@ -59,4 +62,13 @@ interface MusicApi
      * */
     public function top(): array;
 
+    /**
+     * 设置cookie
+     * */
+    public function setCookie($cookie): array;
+
+    /**
+     * 获取cookie
+     * */
+    public function getCookie(): array;
 }
