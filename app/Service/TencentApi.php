@@ -77,7 +77,10 @@ class TencentApi implements MusicApi
         return $result;
     }
 
-
+    /**
+     * 获取歌单内容
+     * @param string $id 歌单id
+     * */
     public function playList(string $id): array
     {
         $params = [
@@ -99,6 +102,10 @@ class TencentApi implements MusicApi
         return $result['cdlist'];
     }
 
+    /**
+     * 获取作者详情
+     * @param string $artistId 作者id
+     * */
     public function artist(string $artistId): array
     {
         $params = [
@@ -114,7 +121,7 @@ class TencentApi implements MusicApi
         ];
         $client = $this->clientFactory->create();
         $response = $client->get('https://c.y.qq.com/v8/fcg-bin/fcg_play_single_song.fcg', $params);
-        return $response->getBody()->getContents();
+        return [$response->getBody()->getContents()];
     }
 
     public function album(string $id): array

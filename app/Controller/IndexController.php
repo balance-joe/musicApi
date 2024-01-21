@@ -21,13 +21,17 @@ use Hyperf\HttpServer\Annotation\AutoController;
 class IndexController extends AbstractController
 {
 
-
-    public function index(Container $container)
+    protected $musicApi ;
+    public function __construct(Container $container)
     {
         $musicApi = new MusicApiFactory($container);
-        $res = $musicApi->createMusicApi('tencent');
-        $res = $res->song('');
+        $music_source = $this->request->input('music_source');
+        $this->musicApi = $musicApi->createMusicApi('tencent');
 
+    }
+
+    public function index()
+    {
         $user = $this->request->input('user', 'Hyperf');
         $method = $this->request->getMethod();
 
@@ -40,93 +44,85 @@ class IndexController extends AbstractController
     /**
      * 搜索
      * */
-    public function search(Container $container)
+    public function search()
     {
         $keyword = $this->request->input('keyword', '');
         $type = $this->request->input('type', 0);
         $offset = $this->request->input('offset', 1);
         $limit = $this->request->input('limit', 20);
-        $tencentService = $container->get(TencentService::class);
-        $res = $tencentService->search($keyword, $type, $offset, $limit);
+        $res = $this->musicApi->search($keyword, $type, $offset, $limit);
         return $this->success($res);
     }
 
     /**
      * 获取歌词
      * */
-    public function lyric(Container $container)
+    public function lyric()
     {
         $mid = $this->request->input('mid');
         $type = $this->request->input('type', '1');
-        $tencentService = $container->get(TencentService::class);
-        $res = $tencentService->lyric($mid, $type);
+        $res = $this->musicApi->lyric($mid, $type);
         return $this->success($res);
     }
 
     /**
      * 获取歌单
      * */
-    public function play_list_desc(Container $container)
+    public function play_list()
     {
         $id = $this->request->input('id');
-        $tencentService = $container->get(TencentService::class);
-        $res = $tencentService->playListDesc($id);
+        $res = $this->musicApi->playList($id);
         return $this->success($res);
     }
 
     /**
      * 获取歌曲详情
      * */
-    public function song(Container $container)
+    public function song()
     {
         $mid = $this->request->input('mid');
-        $tencentService = $container->get(TencentService::class);
-        $res = $tencentService->song($mid);
+
+        $res = $this->musicApi->song($mid);
         return $this->success($res);
     }
 
     /**
      * 获取歌曲详情
      * */
-    public function artist(Container $container)
+    public function artist()
     {
         $id = $this->request->input('id');
-        $tencentService = $container->get(TencentService::class);
-        $res = $tencentService->artist($id);
+        $res = $this->musicApi->artist($id);
         return $this->success($res);
     }
 
     /**
      * 获取歌曲地址
      * */
-    public function get_song_url(Container $container)
+    public function get_song_url()
     {
         $mid = $this->request->input('mid');
         $br = $this->request->input('br', 128);
-        $tencentService = $container->get(TencentService::class);
-        $res = $tencentService->getSongUrl($mid, $br);
+        $res = $this->musicApi->url($mid, $br);
         return $this->success($res);
     }
 
     /**
      * 设置Cookie
      * */
-    public function setCookie(Container $container)
+    public function setCookie()
     {
         $data = $this->request->input('data', '');
-        $tencentService = $container->get(TencentService::class);
-        $cookie = $tencentService->setCookie($data);
+        $cookie = $this->musicApi->setCookie($data);
         return $this->success($cookie);
     }
 
     /**
      * 获取Cookie
      * */
-    public function getCookie(Container $container)
+    public function getCookie()
     {
-        $cookie = $this->request->input('cookie', '');
-        $tencentService = $container->get(TencentService::class);
-        $res = $tencentService->getCookie($cookie);
+        $res = $this->musicApi->getCookie();
         return $this->success($res);
     }
 }
