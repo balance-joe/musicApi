@@ -24,10 +24,9 @@ class IndexController extends AbstractController
     protected $musicApi ;
     public function __construct(Container $container)
     {
+        $music_source = $this->request->input('music_source','tencent');
         $musicApi = new MusicApiFactory($container);
-        $music_source = $this->request->input('music_source');
-        $this->musicApi = $musicApi->createMusicApi('tencent');
-
+        $this->musicApi = $musicApi->createMusicApi($music_source);
     }
 
     public function index()

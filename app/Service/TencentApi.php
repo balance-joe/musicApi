@@ -189,7 +189,7 @@ class TencentApi implements MusicApi
      * @param int $songId 歌曲id
      * @param string $br 比特率
      * */
-    public function url($songId, $br = '128'): array
+    public function url($songId, $br = '128'): string
     {
         $uin = '0'; // 设置默认 uin 值
 
@@ -271,8 +271,10 @@ class TencentApi implements MusicApi
     /**
      * 获取cookie
      * */
-    public function getCookie(): array
+    public function getCookie(): string
     {
-        return cache()->get('qq_cookie');
+        $cookie = cache()->get('qq_cookie');
+
+        return $cookie;
     }
 }

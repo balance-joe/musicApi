@@ -50,7 +50,7 @@ interface MusicApi
      * 歌曲url
      * @param $songId string 歌曲id
      * */
-    public function url(string $songId): array;
+    public function url(string $songId): string;
 
     /**
      * 榜单列表
@@ -70,5 +70,5 @@ interface MusicApi
     /**
      * 获取cookie
      * */
-    public function getCookie(): array;
+    public function getCookie(): string;
 }

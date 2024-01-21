@@ -25,19 +25,13 @@ class DownloadService
             return true;
         }
 
-        $tencentService = container()->get(TencentService::class);
-        $br = end($music_info['file']);
-        $url = $tencentService->getSongUrl($music_info['id'], $br);
-        if (!$url) {
-            logger()->notice('获取地址失败:' . $music_info['name'], $music_info);
-        }
         $list[] = [
             'id' => $music_info['id'],
             'lyric_id' => $music_info['lyric_id'],
             'name' => $music_info['name'],
             'artist' => $music_info['artist'],
             'source' => $music_info['source'],
-            'url' => $url
+            'url' => $music_info['url']
         ];
         return cache()->set('music_list', $list);
     }
